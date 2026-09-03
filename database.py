@@ -4,10 +4,10 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 # 1. Настройка URL для SQLite (асинхронный драйвер aiosqlite)
-DATABASE_URL = "sqlite+aiosqlite:///tasks.db"
+DATABASE_URL = "postgresql+asyncpg://postgres.dnjydqwshqllzlqfdjhn:steelzsv0826@://supabase.com"
 
 # 2. Создание движка (Engine)
-engine = create_async_engine(DATABASE_URL)
+engine = create_async_engine(DATABASE_URL, echo=True)
 async def get_db():
     async with new_session() as session:
         yield session
