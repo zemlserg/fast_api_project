@@ -24,6 +24,8 @@ async def lifespan(app: FastAPI):
 
 # Передаем lifespan в приложение
 app = FastAPI(lifespan=lifespan)
+def read_root():
+    return {'status': 'ok', 'message': 'FastAPI на Vercel успешно запущен и работает с Supabase!'}
 app.include_router(tasks_router)
 
 # Добавляем этот блок в конец файла
