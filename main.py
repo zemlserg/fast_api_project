@@ -27,6 +27,3 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(tasks_router)
 
 # Добавляем этот блок в конец файла
-if __name__ == "__main__":
-    # Обратите внимание: имя файла передается как строка
-    uvicorn.run("main:app", host="127.0.0.1", port=8080, reload=True)
