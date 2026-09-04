@@ -1,43 +1,40 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker, declarative_base
 import ssl
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
 from typing import Annotated
 from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-# 1. Ссылку очищаем — УБИРАЕМ из самого конца "?sslmode=require"
-DATABASE_URL = "postgresql+asyncpg://postgres:steelzsv0826@://supabase.com"
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
 
-# 2. Создаем контекст SSL программно через встроенную библиотеку Python
+# 1. Создаем безопасный контекст SSL для Supabase
 ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
-# 3. Передаем SSL-контекст напрямую внутрь движка через connect_args
+# 2. Инициализируем движок, передавая все параметры Supabase в connect_args
+# Это решает проблему блокировки IPv6 на Vercel и ошибку парсинга порта
 engine = create_async_engine(
-    DATABASE_URL,
+    "postgresql+asyncpg://",
     echo=True,
-    connect_args={"ssl": ssl_context} # Теперь asyncpg поймет защиту и не выдаст ошибку
+    connect_args={
+        "user": "postgres",
+        "password": "steelzsv0826",
+        "host": "aws-0-eu-central-1.pooler.supabase.com",
+        "port": 6543,
+        "database": "postgres",
+        "ssl": ssl_context
+    }
 )
 
-# Дальше ваш код сессий и базы остается без изменений:
-AsyncSessionLocal = sessionmaker(
-    bind=engine,
-    class_=AsyncSession,
-    expire_on_commit=False
-)
-
-Base = declarative_base()
-
-async def get_db():
-    async with AsyncSessionLocal() as session:
-        yield session
-
-# 3. Фабрика сессий (Session Factory)
+# 3. Асинхронная фабрика сессий (используем async_sessionmaker, который был у вас)
 new_session = async_sessionmaker(engine, expire_on_commit=False)
 
-# 4. Базовый класс моделей
+# 4. Базовый класс моделей (ваш класс Model)
 class Model(MappedAsDataclass, DeclarativeBase):
     pass
+
+# 5. Функция-генератор сессий для зависимости FastAPI
+async def get_db():
+    async with new_session() as session:
+        yield session
+
+# 6. Зависимость для ваших роутеров (SessionDep)
 SessionDep = Annotated[AsyncSession, Depends(get_db)]
