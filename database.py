@@ -1,7 +1,11 @@
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, declarative_base
 import ssl
-
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
+from typing import Annotated
+from fastapi import Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 # 1. Ссылку очищаем — УБИРАЕМ из самого конца "?sslmode=require"
 DATABASE_URL = "postgresql+asyncpg://postgres:steelzsv0826@://supabase.com"
 
