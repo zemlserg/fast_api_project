@@ -15,8 +15,8 @@ engine = create_async_engine(
     "postgresql+asyncpg://",
     echo=True,
     connect_args={
-        "user": "postgres",
-        "password": "steelzsv0826",
+        "user": "",
+        "password": "",
         "host": "aws-0-eu-central-1.pooler.supabase.com",
         "port": 6543,
         "database": "postgres",
