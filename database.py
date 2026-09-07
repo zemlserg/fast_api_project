@@ -3,7 +3,14 @@ from typing import Annotated
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
+import os
+from dotenv import load_dotenv
 
+load_dotenv()  # Загружаем переменные из .env
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL не задан в переменных окружениях")
 # 1. Создаем безопасный контекст SSL для Supabase
 ssl_context = ssl.create_default_context()
 ssl_context.check_hostname = False
