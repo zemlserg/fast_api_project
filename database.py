@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 # 1. Настройка URL
 # Файл tasks.db создастся в корне проекта
-DATABASE_URL = "postgresql://postgres:sergzsv5431@db.dnjydqwshqllzlqfdjhn.supabase.co:5432/postgres"
+DATABASE_URL = "postgresql+asyncpg://postgres:sergzsv5431@db.dnjydqwshqllzlqfdjhn.supabase.co:5432/postgres"
 
 # 2. Создание движка
 engine = create_async_engine(DATABASE_URL)
