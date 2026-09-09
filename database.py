@@ -1,47 +1,24 @@
-import ssl
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
 from typing import Annotated
 from fastapi import Depends
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase, MappedAsDataclass
-import os
-from dotenv import load_dotenv
+from sqlalchemy.ext.asyncio import AsyncSession
 
-load_dotenv()  # Загружаем переменные из .env
+# 1. Настройка URL
+# Файл tasks.db создастся в корне проекта
+DATABASE_URL = "sqlite+aiosqlite:///tasks.db"
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-if not DATABASE_URL:
-    raise ValueError("DATABASE_URL не задан в переменных окружениях")
-# 1. Создаем безопасный контекст SSL для Supabase
-ssl_context = ssl.create_default_context()
-ssl_context.check_hostname = False
-ssl_context.verify_mode = ssl.CERT_NONE
+# 2. Создание движка
+engine = create_async_engine(DATABASE_URL)
 
-# 2. Инициализируем движок, передавая все параметры Supabase в connect_args
-# Это решает проблему блокировки IPv6 на Vercel и ошибку парсинга порта
-engine = create_async_engine(
-    "postgresql+asyncpg://",
-    echo=True,
-    connect_args={
-        "user": "postgres",
-        "password": "steelzsv0826",
-        "host": "aws-0-eu-central-1.pooler.supabase.com",
-        "port": 6543,
-        "database": "postgres",
-        "ssl": ssl_context
-    }
-)
-
-# 3. Асинхронная фабрика сессий (используем async_sessionmaker, который был у вас)
+# 3. Создание фабрики сессий
 new_session = async_sessionmaker(engine, expire_on_commit=False)
 
-# 4. Базовый класс моделей (ваш класс Model)
-class Model(MappedAsDataclass, DeclarativeBase):
+# 4. Базовый класс для моделей
+# MappedAsDataclass - нужен для удобной работы с типами (новинка 2.0)
+class Model(DeclarativeBase):
     pass
-
-# 5. Функция-генератор сессий для зависимости FastAPI
 async def get_db():
     async with new_session() as session:
         yield session
-
-# 6. Зависимость для ваших роутеров (SessionDep)
 SessionDep = Annotated[AsyncSession, Depends(get_db)]
