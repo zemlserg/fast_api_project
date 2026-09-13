@@ -29,3 +29,11 @@ def read_root():
 app.include_router(tasks_router)
 
 # Добавляем этот блок в конец файла
+@app.get("/")
+async def root():
+    return {
+        "message": "FastAPI + Supabase работает!",
+        "status": "ok",
+        "docs": "/docs"
+    }
+
