@@ -5,8 +5,8 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 # 1. Настройка URL
-# Файл tasks.db создастся в корне проекта
-DATABASE_URL = "postgresql+asyncpg://postgres:sergzsv5431@123.123.123.123:5432/postgres"
+# Файл tasks.db создynастся в корне проекта
+DATABASE_URL = "postgresql+asyncpg://postgres.btvfmeotbjldmucmmtvm:sergzsv5431@aws-0-eu-central-1.pooler.supabase.com:5432/postgres"
 
 # 2. Создание движка
 engine = create_async_engine(DATABASE_URL)
